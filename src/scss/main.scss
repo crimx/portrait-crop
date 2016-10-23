@@ -17,12 +17,7 @@ img {
   }
 
 #imagefile {
-  width: 0;
-  height: 0;
-}
-
-.cropper-container {
-  max-width: 100%;
+  display: none;
 }
 
 // remove gutter
