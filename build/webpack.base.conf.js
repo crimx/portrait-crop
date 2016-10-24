@@ -3,6 +3,13 @@ var config = require('../config')
 var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
 
+var env = process.env.NODE_ENV
+// check env & config/index.js to decide weither to enable CSS Sourcemaps for the
+// various preprocessor loaders added to vue-loader at the end of this file
+var cssSourceMapDev = (env === 'development' && config.dev.cssSourceMap)
+var cssSourceMapProd = (env === 'production' && config.build.productionSourceMap)
+var useCssSourceMap = cssSourceMapDev || cssSourceMapProd
+
 module.exports = {
   entry: {
     app: './src/main.js'
@@ -13,7 +20,7 @@ module.exports = {
     filename: '[name].js'
   },
   resolve: {
-    extensions: ['', '.js'],
+    extensions: ['', '.js', '.vue'],
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
       'src': path.resolve(__dirname, '../src'),
@@ -27,8 +34,10 @@ module.exports = {
   module: {
     preLoaders: [
       {
-        test: /\.html$/,
-        loader: 'html'
+        test: /\.vue$/,
+        loader: 'eslint',
+        include: projectRoot,
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
@@ -38,6 +47,10 @@ module.exports = {
       }
     ],
     loaders: [
+      {
+        test: /\.vue$/,
+        loader: 'vue'
+      },
       {
         test: /\.js$/,
         loader: 'babel',
@@ -52,16 +65,16 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url',
         query: {
-          limit: 5000,
-          name: utils.assetsPath('img/[name].[ext]')
+          limit: 10000,
+          name: utils.assetsPath('img/[name].[hash:7].[ext]')
         }
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url',
         query: {
-          limit: 5000,
-          name: utils.assetsPath('fonts/[name].[ext]')
+          limit: 10000,
+          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
     ]
@@ -76,20 +89,23 @@ module.exports = {
       path.resolve(__dirname, '../node_modules/bootstrap-sass/assets/stylesheets/')
     ]
   },
-  postcss: [
-    require('autoprefixer')({
-      // browsers: ['last 2 versions']
-      // bootstrap sass requirements
-      browsers: [
-        'Android 2.3',
-        'Android >= 4',
-        'Chrome >= 20',
-        'Firefox >= 24',
-        'Explorer >= 8',
-        'iOS >= 6',
-        'Opera >= 12',
-        'Safari >= 6'
-      ]
-    })
-  ]
+  vue: {
+    loaders: utils.cssLoaders({ sourceMap: useCssSourceMap }),
+    postcss: [
+      require('autoprefixer')({
+        // browsers: ['last 2 versions']
+        // bootstrap sass requirements
+        browsers: [
+          'Android 2.3',
+          'Android >= 4',
+          'Chrome >= 20',
+          'Firefox >= 24',
+          'Explorer >= 8',
+          'iOS >= 6',
+          'Opera >= 12',
+          'Safari >= 6'
+        ]
+      })
+    ]
+  }
 }

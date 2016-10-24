@@ -28,23 +28,25 @@ exports.cssLoaders = function (options) {
     // Extract CSS when that option is specified
     // (which is the case during production build)
     if (options.extract) {
-      return ExtractTextPlugin.extract('style-loader', sourceLoader)
+      return ExtractTextPlugin.extract('vue-style-loader', sourceLoader)
     } else {
-      return ['style-loader', sourceLoader].join('!')
+      return ['vue-style-loader', sourceLoader].join('!')
     }
   }
 
+  // http://vuejs.github.io/vue-loader/configurations/extract-css.html
   return {
-    css: generateLoaders(['css', 'postcss']),
-    less: generateLoaders(['css', 'postcss', 'less']),
-    sass: generateLoaders(['css', 'postcss', 'sass?indentedSyntax']),
-    scss: generateLoaders(['css', 'postcss', 'sass']),
-    stylus: generateLoaders(['css', 'postcss', 'stylus']),
-    styl: generateLoaders(['css', 'postcss', 'stylus'])
+    css: generateLoaders(['css']),
+    postcss: generateLoaders(['css']),
+    less: generateLoaders(['css', 'less']),
+    sass: generateLoaders(['css', 'sass?indentedSyntax']),
+    scss: generateLoaders(['css', 'sass']),
+    stylus: generateLoaders(['css', 'stylus']),
+    styl: generateLoaders(['css', 'stylus'])
   }
 }
 
-// Generate loaders for standalone style files
+// Generate loaders for standalone style files (outside of .vue)
 exports.styleLoaders = function (options) {
   var output = []
   var loaders = exports.cssLoaders(options)

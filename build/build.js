@@ -1,5 +1,4 @@
 // https://github.com/shelljs/shelljs
-/* global env rm mkdir cp */
 require('shelljs/global')
 env.NODE_ENV = 'production'
 
