@@ -15,25 +15,27 @@
         </div>
         <div class="sidebar col-xs-12 col-sm-4">
           <div class="row">
-            <div class="col-sm-4 no-right-gutter">
-              <input type="file" id="imagefile" accept=".png, .jpg, .jpeg" @change="handleFileUpload">
-              <label type="button" class="btn btn-info" for="imagefile">Upload File</label>
-            </div>
-            <div class="col-sm-8 no-left-gutter" :class="{ 'has-error': isUrlInvalid }">
-              <input type="url" id="imageurl" class="form-control" placeholder="Or paste image URL here" @input="handleUrlInput">
+            <div class="col-sm-12">
+              <div class="form-inline" :class="{ 'has-error': isUrlInvalid }">
+                <label type="button" class="btn btn-primary" for="imagefile">Upload File</label>
+                <div class="form-group">
+                  <input type="file" id="imagefile" accept=".png, .jpg, .jpeg" @change="handleFileUpload">
+                  <input type="url" id="imageurl" class="form-control" placeholder="Or paste image URL here" @input="handleUrlInput">
+                </div>
+              </div>
             </div>
           </div>  <!-- row -->
           <div class="row">
             <div class="col-sm-6">
               <div class="input-group">
                 <div class="input-group-addon">X</div>
-                <input type="number" class="form-control" placeholder="Cropped X" v-model="cropBox.x" @input="updateCropBox('x', $event)">
+                <input type="number" class="form-control" placeholder="Cropped X" v-model="croppedArea.x" @input="updateCropBox('x', $event)">
               </div>
             </div>
             <div class="col-sm-6">
               <div class="input-group">
                 <div class="input-group-addon">Y</div>
-                <input type="number" class="form-control" placeholder="Cropped Y" v-model="cropBox.y" @input="updateCropBox('y', $event)">
+                <input type="number" class="form-control" placeholder="Cropped Y" v-model="croppedArea.y" @input="updateCropBox('y', $event)">
               </div>
             </div>
           </div> <!-- row -->
@@ -41,13 +43,13 @@
             <div class="col-sm-6">
               <div class="input-group">
                 <div class="input-group-addon">Width</div>
-                <input type="number" class="form-control" placeholder="Cropped Width" v-model="cropBox.width" @input="updateCropBox('width', $event)">
+                <input type="number" class="form-control" placeholder="Cropped Width" v-model="croppedArea.width" @input="updateCropBox('width', $event)">
               </div>
             </div>
             <div class="col-sm-6">
               <div class="input-group">
                 <div class="input-group-addon">Height</div>
-                <input type="number" class="form-control" placeholder="Cropped Height" v-model="cropBox.height" @input="updateCropBox('height', $event)">
+                <input type="number" class="form-control" placeholder="Cropped Height" v-model="croppedArea.height" @input="updateCropBox('height', $event)">
               </div>
             </div>
           </div> <!-- row -->
@@ -91,7 +93,8 @@
 
 <script>
 /* global FileReader XMLHttpRequest */
-// import InputGroup from './components/InputGroup.vue'
+import Vue from 'vue'
+import Focus from './components/Focus.vue'
 
 import Cropper from 'cropperjs'
 require('cropperjs/dist/cropper.min.css')
@@ -99,17 +102,22 @@ require('cropperjs/dist/cropper.min.css')
 export default {
   name: 'app',
   components: {
-    // 'inputgroup': InputGroup
+    'focus': Focus
   },
   data () {
     return {
       cropper: null,
       cropBox: {
+        minWidth: 40,
+        minHeight: 40
+      },
+      croppedArea: {
         x: 0,
         y: 0,
         width: 0,
         height: 0
       },
+      isCropperReady: false,
       isUrlInvalid: false,
       isCropping: false,
       aspectRatio: '9x16',
@@ -122,9 +130,22 @@ export default {
     vm.cropper = new Cropper(document.getElementById('image'), {
       aspectRatio: 9 / 16,
       minContainerHeight: 400,
+      minCropBoxWidth: vm.cropBox.minWidth,
+      minCropBoxHeight: vm.cropBox.minHeight,
       ready () {
+        vm.isCropperReady = true
         vm.cropBoxFullHeight()
-        vm.updateCropBoxInfo(vm.cropper.getData())
+        vm.updateCroppedArea(vm.cropper.getData())
+        let $Focus = Vue.extend(Focus)
+        let focus = new $Focus({
+          propsData: {
+            cropper: vm.cropper,
+            width: vm.cropBox.minWidth,
+            height: vm.cropBox.minHeight
+          }
+        })
+        let $cropperCropBox = document.getElementsByClassName('cropper-crop-box')[0]
+        $cropperCropBox.appendChild(focus.$mount().$el)
       },
       cropstart () {
         vm.isCropping = true
@@ -134,7 +155,7 @@ export default {
       },
       crop (evt) {
         if (vm.isCropping) {
-          vm.updateCropBoxInfo({
+          vm.updateCroppedArea({
             x: evt.detail.x,
             y: evt.detail.y,
             width: evt.detail.width,
@@ -150,17 +171,17 @@ export default {
         height: this.cropper.getContainerData().height
       })
     },
-    updateCropBoxInfo (cropBoxData) {
-      var cropBox = this.cropBox
-      cropBox.x = cropBoxData.x
-      cropBox.y = cropBoxData.y
-      cropBox.width = cropBoxData.width
-      cropBox.height = cropBoxData.height
+    updateCroppedArea (data) {
+      var croppedArea = this.croppedArea
+      croppedArea.x = data.x
+      croppedArea.y = data.y
+      croppedArea.width = data.width
+      croppedArea.height = data.height
     },
     updateCropBox (key, evt) {
       if (evt.target.validity.valid) {
         let data = {}
-        data[key] = +this.cropBox[key]
+        data[key] = +this.croppedArea[key]
         this.cropper.setData(data)
       }
     },
@@ -213,12 +234,12 @@ export default {
       this.aspectRatio = flag
       this.cropper.setAspectRatio(value)
       this.cropper.setData(oldBoxData)
-      this.updateCropBoxInfo(oldBoxData)
+      this.updateCroppedArea(oldBoxData)
     },
     handleReset () {
       this.cropper.reset()
       this.cropBoxFullHeight()
-      this.updateCropBoxInfo(this.cropper.getData())
+      this.updateCroppedArea(this.cropper.getData())
     },
     handleCropAction () {
       var a = document.createElement('a')
