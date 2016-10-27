@@ -6,11 +6,13 @@
 <script>
 export default {
   name: 'focus',
-  props: ['cropper', 'width', 'height'],
+  props: ['cropBox'],
   data () {
     return {
-      left: 0, // (this.cropBoxData.width - this.width) / 2,
-      top: 0, // (this.cropBoxData.height - this.height) / 2,
+      left: (this.cropBox.width - this.cropBox.minWidth) / 2,
+      top: (this.cropBox.height - this.cropBox.minHeight) / 2,
+      width: this.cropBox.minWidth,
+      height: this.cropBox.minHeight,
 
       isMouseDown: false,
       oldMouseX: null,
@@ -45,6 +47,10 @@ export default {
     ].forEach((type) => {
       window.addEventListener(type, this.handleMouseMove)
     })
+
+    this.$on('crop-box-resized', function (wOffset, hOffset) {
+      this.moveTo(this.left * wOffset, this.top * hOffset)
+    })
   },
   methods: {
     handleMouseDown (evt) {
@@ -68,6 +74,7 @@ export default {
       if (!this.isMouseDown) { return }
       evt.stopPropagation()
       evt.preventDefault()
+
       var pageX = evt.pageX
       var pageY = evt.pageY
       if (evt.touches) {
@@ -80,7 +87,7 @@ export default {
       this.oldMouseY = pageY
     },
     moveTo (newLeft, newTop) {
-      var cropBox = this.cropper.getCropBoxData()
+      var cropBox = this.cropBox
       if (newTop < 0) {
         this.top = 0
       } else if (newTop + this.height > cropBox.height) {
@@ -95,8 +102,24 @@ export default {
       } else {
         this.left = newLeft
       }
-      // this.top = newTop
-      // this.left = newLeft
+
+      this.emitChange()
+    },
+    emitChange () {
+      this.$emit('focus-changed', {
+        left: this.left,
+        top: this.top,
+        width: this.width,
+        height: this.height
+      })
+    }
+  },
+  watch: {
+    'cropBox.left': function () {
+      this.emitChange()
+    },
+    'cropBox.right': function () {
+      this.emitChange()
     }
   }
 }
@@ -110,5 +133,6 @@ export default {
   width: 40px;
   height: 40px;
   opacity: .5;
+  cursor: move;
 }
 </style>
