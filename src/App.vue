@@ -12,7 +12,7 @@
       <div class="row">
         <div class="canvas col-xs-12 col-sm-8">
           <div>
-            <img id="image" src="./assets/logo.png">
+            <img id="image" src="./assets/background.png">
           </div>
         </div>
         <div class="sidebar col-xs-12 col-sm-4">
@@ -152,6 +152,7 @@ export default {
       minCropBoxWidth: vm.cropBox.minWidth,
       minCropBoxHeight: vm.cropBox.minHeight,
       ready () {
+        vm.handleReset()
         // mount the focus point element
         let $Focus = Vue.extend(Focus)
         vm.vmFocus = new $Focus({
@@ -178,8 +179,7 @@ export default {
             ((fData.top + fData.height / 2) / cropBox.height * 100).toFixed(2)
         })
 
-        vm.cropBoxFullHeight()
-        vm.updateCropperData()
+        vm.vmFocus.emitChange()
       },
       cropstart () {
         vm.isCropping = true
@@ -221,7 +221,7 @@ export default {
       var cropBox = this.cropBox
       var wOffset = cbData.width / cropBox.width
       var hOffset = cbData.height / cropBox.height
-      if (wOffset !== 1 || hOffset !== 1) {
+      if ((wOffset !== 1 || hOffset !== 1) && this.vmFocus) {
         this.vmFocus.$emit('crop-box-resized', wOffset, hOffset)
       }
       cropBox.left = cbData.left
@@ -324,6 +324,9 @@ img {
   padding: 10px;
   background: #2ecc71;
   margin-bottom: 10px;
+  &:hover {
+    background: #27ae60;
+  }
 
   a {
     &:link,
@@ -336,7 +339,14 @@ img {
   }
 }
   .title {
+    font-size: 2.5em;
     margin: 0;
+    text-shadow: 4px 3px 0 #27ae60;
+  }
+
+  .description {
+    margin: 0;
+    text-shadow: 4px 3px 0 #27ae60;
   }
 
 #imagefile {

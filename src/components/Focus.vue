@@ -9,8 +9,8 @@ export default {
   props: ['cropBox'],
   data () {
     return {
-      left: (this.cropBox.width - this.cropBox.minWidth) / 2,
-      top: (this.cropBox.height - this.cropBox.minHeight) / 2,
+      left: this.cropBox.width / 3 - this.cropBox.minWidth / 2,
+      top: this.cropBox.height / 3 - this.cropBox.minHeight / 2,
       width: this.cropBox.minWidth,
       height: this.cropBox.minHeight,
 
