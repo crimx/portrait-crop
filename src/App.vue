@@ -22,7 +22,7 @@
                 <label type="button" class="btn btn-primary" for="imagefile">Upload File</label>
                 <div class="form-group">
                   <input type="file" id="imagefile" accept=".png, .jpg, .jpeg" @change="handleFileUpload">
-                  <input type="url" id="imageurl" class="form-control" placeholder="Or paste image URL here" @input="handleUrlInput">
+                  <input type="url" id="imageurl" class="form-control" placeholder="Paste image URL or drag file here" @input="handleUrlInput">
                 </div>
               </div>
             </div>
@@ -96,6 +96,9 @@
         </div> <!-- sidebar -->
       </div> <!-- row -->
     </div> <!-- container -->
+    <div class="drag-area" v-show="isDragging">
+      <h1 class="drag-text">DROP<br>HERE</h1>
+    </div>
   </div>
 </template>
 
@@ -138,6 +141,7 @@ export default {
       },
       isUrlInvalid: false,
       isCropping: false,
+      isDragging: false,
       aspectRatio: '9x16',
       saveType: 'png',
       fileName: 'Cropped'
@@ -153,7 +157,9 @@ export default {
       minCropBoxHeight: vm.cropBox.minHeight,
       ready () {
         vm.handleReset()
-        // mount the focus point element
+        /* =================================== *\
+           Mount the focus point
+        \* =================================== */
         let $Focus = Vue.extend(Focus)
         vm.vmFocus = new $Focus({
           propsData: {
@@ -162,7 +168,6 @@ export default {
         })
         let $cropperCropBox = document.getElementsByClassName('cropper-crop-box')[0]
         $cropperCropBox.appendChild(vm.vmFocus.$mount().$el)
-
         // listen to child component
         vm.vmFocus.$on('focus-changed', function (fData) {
           var cData = vm.cropper.getCanvasData()
@@ -189,10 +194,51 @@ export default {
       },
       crop (evt) {
         // when crop box changes
+
         if (vm.isCropping) {
           vm.updateCropperData()
         } // if not cropping, the data is written to the vm directly from input box
       }
+    })
+
+    /* =================================== *\
+       DRAG AND DROP
+    \* =================================== */
+    /* global Dragster */
+    require('dragster')
+    /* eslint-disable no-new */
+    var dragster = new Dragster(document)
+
+    document.addEventListener('dragster:enter', (evt) => {
+      vm.isDragging = true
+    })
+
+    document.addEventListener('dragster:leave', (evt) => {
+      vm.isDragging = false
+    })
+
+    ;[
+      'drag',
+      'dragend',
+      'dragenter',
+      'dragexit',
+      'dragleave',
+      'dragover',
+      'dragstart',
+      'drop'
+    ].forEach((type) => {
+      document.addEventListener(type, (evt) => {
+        evt.stopPropagation()
+        evt.preventDefault()
+      })
+    })
+
+    document.addEventListener('drop', (evt) => {
+      if (evt.dataTransfer.files.length > 0) {
+        vm.readImageFile(evt.dataTransfer.files[0])
+      }
+      vm.isDragging = false
+      dragster.reset()
     })
   },
   methods: {
@@ -236,12 +282,11 @@ export default {
         this.cropper.setData(data)
       }
     },
-    handleFileUpload (evt) {
+    readImageFile (file) {
       var vm = this
-      var file = evt.target.files[0]
       if (/^image\/\w+$/i.test(file.type)) {
         vm.saveType = /png/i.test(file.type) ? 'png' : 'jpeg'
-        vm.fileName = file.name.split('.')[0]
+        vm.fileName = file.name.split('.')[0] + '-cropped'
 
         let reader = new FileReader()
         reader.onload = function () {
@@ -250,9 +295,15 @@ export default {
         }
         reader.readAsDataURL(file)
       } else {
-        window.alert('Please choose an image file.')
+        window.alert('Please choose a jpg/png iamge file.')
       }
     },
+    handleFileUpload (evt) {
+      if (evt.target.files.length > 0) {
+        this.readImageFile(evt.target.files[0])
+      }
+    },
+
     handleUrlInput (evt) {
       var vm = this
       var url = evt.target.value
@@ -310,9 +361,20 @@ export default {
 <style lang="scss">
 @import './bootstrap-custom';
 
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
 /* Limit image width to avoid overflow the container */
 img {
   max-width: 100%;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /*remove gutter*/
@@ -352,6 +414,31 @@ img {
 #imagefile {
   display: none;
 }
+
+
+/* =================================== *\
+   DRAG AND DROP
+\* =================================== */
+.drag-area {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 999999;
+  background: rgba(0, 0, 0, .8);
+}
+
+  .drag-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    font-size: 10em;
+    color: #fff;
+  }
+
 
 /* =================================== *\
    CODE BLOCK
