@@ -198,6 +198,13 @@ export default {
         if (vm.isCropping) {
           vm.updateCropperData()
         } // if not cropping, the data is written to the vm directly from input box
+
+        // cropperjs bug
+        if (vm.cropper.getCropBoxData().width < vm.cropBox.minWidth) {
+          vm.cropper.setCropBoxData({
+            width: vm.cropBox.minWidth
+          })
+        }
       }
     })
 
