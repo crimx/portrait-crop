@@ -17,14 +17,12 @@
         </div>
         <div class="sidebar col-xs-12 col-sm-4">
           <div class="row">
-            <div class="col-sm-12">
-              <div class="form-inline" :class="{ 'has-error': isUrlInvalid }">
-                <label type="button" class="btn btn-primary" for="imagefile">Upload File</label>
-                <div class="form-group">
-                  <input type="file" id="imagefile" accept=".png, .jpg, .jpeg" @change="handleFileUpload">
-                  <input type="url" id="imageurl" class="form-control" placeholder="Paste image URL or drag file here" @input="handleUrlInput">
-                </div>
-              </div>
+            <div class="col-sm-4 no-right-gutter" :class="{ 'has-error': isUrlInvalid }">
+              <label type="button" class="btn btn-primary" for="imagefile">Upload File</label>
+              <input type="file" id="imagefile" accept=".png, .jpg, .jpeg" @change="handleFileUpload">
+            </div>
+            <div class="col-sm-8 no-left-gutter">
+              <input type="url" id="imageurl" class="form-control" placeholder="Paste image URL or drag file here" size="27" @input="handleUrlInput">
             </div>
           </div>  <!-- row -->
           <div class="row">
