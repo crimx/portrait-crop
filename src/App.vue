@@ -88,7 +88,12 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <pre><code class="lang-css"><span class="hljs-class">.image-landscape</span> <span class="hljs-rules">{<br>  <span class="hljs-rule"><span class="hljs-attribute">background-size</span>:<span class="hljs-value"> cover</span></span>;<br>  <span class="hljs-rule"><span class="hljs-attribute">background-repeat</span>:<span class="hljs-value"> no-repeat</span></span>;<br>  <span class="hljs-rule"><span class="hljs-attribute">background-position</span>:<span class="hljs-value"> <span class="hljs-number">{{ bgPosition.landscapeLeft }}%</span> <span class="hljs-number">{{ bgPosition.landscapeTop }}%</span></span></span>;<br>}</span><br><br><span class="hljs-class">.image-portrait</span> <span class="hljs-rules">{<br>  <span class="hljs-rule"><span class="hljs-attribute">background-size</span>:<span class="hljs-value"> cover</span></span>;<br>  <span class="hljs-rule"><span class="hljs-attribute">background-repeat</span>:<span class="hljs-value"> no-repeat</span></span>;<br>  <span class="hljs-rule"><span class="hljs-attribute">background-position</span>:<span class="hljs-value"> <span class="hljs-number">{{ bgPosition.portraitLeft }}%</span> <span class="hljs-number">{{ bgPosition.portraitTop }}%</span></span></span>;<br>}</span><br></code></pre>
+              <pre><code class="lang-css"><span class="hljs-class">.cover</span> <span class="hljs-rules">{<br>  <span class="hljs-rule"><span class="hljs-attribute">background-size</span>:<span class="hljs-value"> cover</span></span>;<br>  <span class="hljs-rule"><span class="hljs-attribute">background-repeat</span>:<span class="hljs-value"> no-repeat</span></span>;<br>}</span><br><span class="hljs-class">.cover-landscape</span> <span class="hljs-rules">{<br>  <span class="hljs-rule"><span class="hljs-attribute">background-position</span>: <span class="hljs-number">{{ bgPosition.landscapeLeft }}%</span> <span class="hljs-number">{{ bgPosition.landscapeTop }}%</span></span>;<br>}</span><br><span class="hljs-class">.cover-portrait</span> <span class="hljs-rules">{<br>  <span class="hljs-rule"><span class="hljs-attribute">background-position</span>: <span class="hljs-number">{{ bgPosition.portraitLeft }}%</span> <span class="hljs-number">{{ bgPosition.portraitTop }}%</span></span>;<br>}</span></code></pre>
+            </div>
+          </div> <!-- row -->
+          <div class="row">
+            <div class="col-sm-12">
+              <pre><code>{<br>  ...<br>  <span class="hljs-attribute">"{{ fileName }}.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: {<br>    <span class="hljs-attribute">"left"</span>: <span class="hljs-value">"{{ bgPosition.landscapeLeft }}%"</span>,<br>    <span class="hljs-attribute">"top"</span>: <span class="hljs-value">"{{ bgPosition.landscapeTop }}%"</span><br>  },<br>  <span class="hljs-attribute">"{{ fileName }}-portrait.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: {<br>    <span class="hljs-attribute">"left"</span>: <span class="hljs-value">"{{ bgPosition.portraitLeft }}%"</span>,<br>    <span class="hljs-attribute">"top"</span>: <span class="hljs-value">"{{ bgPosition.portraitTop }}%"</span><br>  },<br>  ...<br>}</code></pre>
             </div>
           </div> <!-- row -->
         </div> <!-- sidebar -->
@@ -355,7 +360,7 @@ export default {
       a.href = this.cropper.getCroppedCanvas(this.saveType === 'png' ? null : {
         fillColor: '#fff'
       }).toDataURL('image/' + this.saveType)
-      a.download = this.fileName
+      a.download = this.fileName + '-portrait'
       a.click()
     }
   }
