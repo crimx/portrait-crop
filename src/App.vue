@@ -296,7 +296,7 @@ export default {
       var vm = this
       if (/^image\/\w+$/i.test(file.type)) {
         vm.saveType = /png/i.test(file.type) ? 'png' : 'jpeg'
-        vm.fileName = file.name.split('.')[0] + '-cropped'
+        vm.fileName = file.name.split('.')[0]
 
         let reader = new FileReader()
         reader.onload = function () {
