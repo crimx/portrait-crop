@@ -93,7 +93,7 @@
           </div> <!-- row -->
           <div class="row">
             <div class="col-sm-12">
-              <pre><code>{<br>  ...<br>  <span class="hljs-attribute">"{{ fileName }}.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: {<br>    <span class="hljs-attribute">"left"</span>: <span class="hljs-value">"{{ bgPosition.landscapeLeft }}%"</span>,<br>    <span class="hljs-attribute">"top"</span>: <span class="hljs-value">"{{ bgPosition.landscapeTop }}%"</span><br>  },<br>  <span class="hljs-attribute">"{{ fileName }}-portrait.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: {<br>    <span class="hljs-attribute">"left"</span>: <span class="hljs-value">"{{ bgPosition.portraitLeft }}%"</span>,<br>    <span class="hljs-attribute">"top"</span>: <span class="hljs-value">"{{ bgPosition.portraitTop }}%"</span><br>  },<br>  ...<br>}</code></pre>
+              <pre><code>{<br>  ...<br>  <span class="hljs-attribute">"{{ fileName }}.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: <span class="hljs-value">"{{ bgPosition.landscapeLeft }}% {{ bgPosition.landscapeTop }}%"</span>,<br>  <span class="hljs-attribute">"{{ fileName }}-portrait.{{ saveType === 'png' ? 'png' : 'jpg'}}"</span>: <span class="hljs-value">"{{ bgPosition.portraitLeft }}% {{ bgPosition.portraitTop }}%"</span>,<br>  ...<br>}</code></pre>
             </div>
           </div> <!-- row -->
         </div> <!-- sidebar -->
